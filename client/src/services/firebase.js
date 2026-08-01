@@ -10,7 +10,7 @@ import {
   child
 } from "firebase/database";
 
-// ===== 🔥 તમારો Firebase Config અહીં મૂકો =====
+// ===== 🔥 તમારો Firebase Config =====
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -29,9 +29,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
 
 // =============================================
 // 📌 DATABASE FUNCTIONS
@@ -58,7 +55,6 @@ export const listenAllData = (callback) => {
     callback(data);
   }, (error) => {
     console.error("❌ Firebase Error:", error);
-    // Error આવે તો Empty Data પાસ કરો
     callback({ labours: [], expenses: [], personalExpenses: [] });
   });
 };
