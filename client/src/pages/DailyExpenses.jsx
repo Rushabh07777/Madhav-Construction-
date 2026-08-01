@@ -7,11 +7,12 @@ import {
   getTodayTotalExpense,
   getMonthlyTotalExpense
 } from '../services/expenseService';
+import { addExpenseToFirebase, deleteExpenseFromFirebase } from '../services/firebase';
 import ExpenseList from '../components/ExpenseList';
 import AddExpenseModal from '../components/AddExpenseModal';
 import BackButton from '../components/BackButton';
 
-function DailyExpenses() {
+function DailyExpenses({ syncData }) {  // ← props માં syncData ઉમેરો
   const [expenses, setExpenses] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
@@ -33,19 +34,45 @@ function DailyExpenses() {
 
   const handleAddExpense = (expenseData) => {
     if (editingExpense) {
+      // Update Expense
       updateExpense(editingExpense.id, expenseData);
       setEditingExpense(null);
     } else {
-      addExpense(expenseData);
+      // Add Expense
+      const newExpense = {
+        id: Date.now().toString(),
+        date: expenseData.date || new Date().toISOString().split('T')[0],
+        description: expenseData.description,
+        amount: parseFloat(expenseData.amount) || 0,
+        category: expenseData.category || 'અન્ય',
+        createdAt: new Date().toISOString()
+      };
+      
+      // 🔥 Firebase માં સેવ કરો
+      addExpenseToFirebase(newExpense);
+      
+      // Local Storage માં સેવ કરો
+      addExpense(newExpense);
     }
+    
     loadData();
     setShowModal(false);
+    
+    // ✅ Firebase Sync કરો
+    if (syncData) {
+      syncData();
+    }
   };
 
   const handleDelete = (id) => {
     if (window.confirm('શું તમે ખરેખર આ ખર્ચને ડિલીટ કરવા માંગો છો?')) {
       deleteExpense(id);
       loadData();
+      
+      // ✅ Firebase Sync કરો
+      if (syncData) {
+        syncData();
+      }
     }
   };
 
@@ -106,4 +133,4 @@ function DailyExpenses() {
   );
 }
 
-export default DailyExpenses;
+export default DailyExpenses;  // ← default export છે તેની ખાતરી કરો

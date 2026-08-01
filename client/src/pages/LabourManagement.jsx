@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getLabours, addLabour, updateLabour, deleteLabour, toggleAttendance } from '../services/labourService';
+import { addLabourToFirebase, deleteLabourFromFirebase } from '../services/firebase';
 import StatsCard from '../components/StatsCard';
 import LabourList from '../components/LabourList';
 import AddLabourModal from '../components/AddLabourModal';
 import BackButton from '../components/BackButton';
 
-function LabourManagement() {
+function LabourManagement({ syncData }) {  // ← props માં syncData ઉમેરો
   const [labours, setLabours] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingLabour, setEditingLabour] = useState(null);
@@ -38,24 +39,55 @@ function LabourManagement() {
 
   const handleAddLabour = (labourData) => {
     if (editingLabour) {
+      // Update Labour
       updateLabour(editingLabour.id, labourData);
       setEditingLabour(null);
     } else {
-      addLabour(labourData);
+      // Add Labour
+      const newLabour = {
+        id: Date.now().toString(),
+        name: labourData.name,
+        dailyWage: parseFloat(labourData.dailyWage) || 0,
+        attendance: labourData.attendance || [],
+        totalAmount: 0,
+        createdAt: new Date().toISOString()
+      };
+      
+      // 🔥 Firebase માં સેવ કરો
+      addLabourToFirebase(newLabour);
+      
+      // Local Storage માં સેવ કરો
+      addLabour(newLabour);
     }
+    
     loadData();
     setShowModal(false);
+    
+    // ✅ Firebase Sync કરો
+    if (syncData) {
+      syncData();
+    }
   };
 
   const handleToggleAttendance = (id) => {
     toggleAttendance(id);
     loadData();
+    
+    // ✅ Firebase Sync કરો
+    if (syncData) {
+      syncData();
+    }
   };
 
   const handleDelete = (id) => {
     if (window.confirm('શું તમે ખરેખર આ લેબરને ડિલીટ કરવા માંગો છો?')) {
       deleteLabour(id);
       loadData();
+      
+      // ✅ Firebase Sync કરો
+      if (syncData) {
+        syncData();
+      }
     }
   };
 
@@ -107,4 +139,4 @@ function LabourManagement() {
   );
 }
 
-export default LabourManagement;
+export default LabourManagement;  // ← default export છે તેની ખાતરી કરો
