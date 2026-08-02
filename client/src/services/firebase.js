@@ -11,12 +11,6 @@ import {
 } from "firebase/database";
 
 // ===== 🔥 તમારો Firebase Config =====
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyATkGW2da0VyRwKP2LuskJR194XqtzVGcc",
   authDomain: "madhav-construction-8bd91.firebaseapp.com",
@@ -29,6 +23,9 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// ✅ અહીં db ને ઇનિશિયલાઇઝ કરવાનું ચૂકી ગયા હતા, તે ઉમેર્યું
+const db = getDatabase(app);
 
 // =============================================
 // 📌 DATABASE FUNCTIONS
