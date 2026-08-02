@@ -29,11 +29,13 @@ function App() {
     });
   }, []);
 
+  // 📤 Data Sync કરવા માટે function
   const syncData = () => {
     const labours = JSON.parse(localStorage.getItem('madhav_construction_labours') || '[]');
     const expenses = JSON.parse(localStorage.getItem('madhav_construction_expenses') || '[]');
     const personalExpenses = JSON.parse(localStorage.getItem('madhav_personal_expenses') || '[]');
     syncAllData(labours, expenses, personalExpenses);
+    console.log("✅ Data Synced to Firebase");
   };
 
   if (isLoading) {

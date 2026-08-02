@@ -8,12 +8,12 @@ import {
   getWeeklyTotalPersonalExpense,
   getMonthlyTotalPersonalExpense
 } from '../services/personalExpenseService';
-import { addPersonalExpenseToFirebase, deletePersonalExpenseFromFirebase } from '../services/firebase';
+import { deletePersonalExpenseFromFirebase } from '../services/firebase';
 import PersonalExpenseList from '../components/PersonalExpenseList';
 import AddPersonalExpenseModal from '../components/AddPersonalExpenseModal';
 import BackButton from '../components/BackButton';
 
-function PersonalExpenses({ syncData }) {  // ← props માં syncData ઉમેરો
+function PersonalExpenses({ syncData }) {
   const [expenses, setExpenses] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
@@ -37,11 +37,9 @@ function PersonalExpenses({ syncData }) {  // ← props માં syncData ઉ�
 
   const handleAddExpense = (expenseData) => {
     if (editingExpense) {
-      // Update Personal Expense
       updatePersonalExpense(editingExpense.id, expenseData);
       setEditingExpense(null);
     } else {
-      // Add Personal Expense
       const newExpense = {
         id: Date.now().toString(),
         date: expenseData.date || new Date().toISOString().split('T')[0],
@@ -53,17 +51,12 @@ function PersonalExpenses({ syncData }) {  // ← props માં syncData ઉ�
         createdAt: new Date().toISOString()
       };
       
-      // 🔥 Firebase માં સેવ કરો
-      addPersonalExpenseToFirebase(newExpense);
-      
-      // Local Storage માં સેવ કરો
       addPersonalExpense(newExpense);
     }
     
     loadData();
     setShowModal(false);
     
-    // ✅ Firebase Sync કરો
     if (syncData) {
       syncData();
     }
@@ -71,14 +64,10 @@ function PersonalExpenses({ syncData }) {  // ← props માં syncData ઉ�
 
   const handleDelete = (id) => {
     if (window.confirm('શું તમે ખરેખર આ ખર્ચને ડિલીટ કરવા માંગો છો?')) {
-      // 🔥 Firebase માંથી ડિલીટ કરો
-      // Note: Firebase માં index based delete છે, એટલે આપણે સરળતા માટે localStorage delete કરીશું
-      // અને પછી sync કરીશું
-      
       deletePersonalExpense(id);
+      deletePersonalExpenseFromFirebase(id);
       loadData();
       
-      // ✅ Firebase Sync કરો (આખો ડેટા ફરી સેવ થશે)
       if (syncData) {
         syncData();
       }
@@ -107,7 +96,6 @@ function PersonalExpenses({ syncData }) {  // ← props માં syncData ઉ�
         </button>
       </div>
 
-      {/* Stats Cards */}
       <div className="row g-2 mb-3">
         <div className="col-4">
           <div className="card shadow-sm p-2 text-center">
@@ -148,4 +136,4 @@ function PersonalExpenses({ syncData }) {  // ← props માં syncData ઉ�
   );
 }
 
-export default PersonalExpenses;  // ← default export છે તેની ખાતરી કરો
+export default PersonalExpenses;

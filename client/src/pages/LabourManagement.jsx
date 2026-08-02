@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getLabours, addLabour, updateLabour, deleteLabour, toggleAttendance } from '../services/labourService';
-import { addLabourToFirebase, deleteLabourFromFirebase } from '../services/firebase';
+import { deleteLabourFromFirebase } from '../services/firebase';
 import StatsCard from '../components/StatsCard';
 import LabourList from '../components/LabourList';
 import AddLabourModal from '../components/AddLabourModal';
 import BackButton from '../components/BackButton';
 
-function LabourManagement({ syncData }) {  // ← props માં syncData ઉમેરો
+function LabourManagement({ syncData }) {
   const [labours, setLabours] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingLabour, setEditingLabour] = useState(null);
@@ -39,22 +39,19 @@ function LabourManagement({ syncData }) {  // ← props માં syncData ઉ�
 
   const handleAddLabour = (labourData) => {
     if (editingLabour) {
-      // Update Labour
+      // Update Labour - Local Storage
       updateLabour(editingLabour.id, labourData);
       setEditingLabour(null);
     } else {
-      // Add Labour
+      // Add Labour - Only Local Storage
       const newLabour = {
         id: Date.now().toString(),
         name: labourData.name,
         dailyWage: parseFloat(labourData.dailyWage) || 0,
-        attendance: labourData.attendance || [],
+        attendance: [],
         totalAmount: 0,
         createdAt: new Date().toISOString()
       };
-      
-      // 🔥 Firebase માં સેવ કરો
-      addLabourToFirebase(newLabour);
       
       // Local Storage માં સેવ કરો
       addLabour(newLabour);
@@ -63,7 +60,7 @@ function LabourManagement({ syncData }) {  // ← props માં syncData ઉ�
     loadData();
     setShowModal(false);
     
-    // ✅ Firebase Sync કરો
+    // ✅ Firebase Sync કરો - આખો ડેટા સેવ થશે
     if (syncData) {
       syncData();
     }
@@ -73,7 +70,6 @@ function LabourManagement({ syncData }) {  // ← props માં syncData ઉ�
     toggleAttendance(id);
     loadData();
     
-    // ✅ Firebase Sync કરો
     if (syncData) {
       syncData();
     }
@@ -81,10 +77,13 @@ function LabourManagement({ syncData }) {  // ← props માં syncData ઉ�
 
   const handleDelete = (id) => {
     if (window.confirm('શું તમે ખરેખર આ લેબરને ડિલીટ કરવા માંગો છો?')) {
+      // Local Storage માંથી ડિલીટ કરો
       deleteLabour(id);
       loadData();
       
-      // ✅ Firebase Sync કરો
+      // Firebase માંથી પણ ડિલીટ કરો
+      deleteLabourFromFirebase(id);
+      
       if (syncData) {
         syncData();
       }
@@ -139,4 +138,4 @@ function LabourManagement({ syncData }) {  // ← props માં syncData ઉ�
   );
 }
 
-export default LabourManagement;  // ← default export છે તેની ખાતરી કરો
+export default LabourManagement;

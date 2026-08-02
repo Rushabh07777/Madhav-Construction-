@@ -7,12 +7,12 @@ import {
   getTodayTotalExpense,
   getMonthlyTotalExpense
 } from '../services/expenseService';
-import { addExpenseToFirebase, deleteExpenseFromFirebase } from '../services/firebase';
+import { deleteExpenseFromFirebase } from '../services/firebase';
 import ExpenseList from '../components/ExpenseList';
 import AddExpenseModal from '../components/AddExpenseModal';
 import BackButton from '../components/BackButton';
 
-function DailyExpenses({ syncData }) {  // ← props માં syncData ઉમેરો
+function DailyExpenses({ syncData }) {
   const [expenses, setExpenses] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
@@ -34,11 +34,9 @@ function DailyExpenses({ syncData }) {  // ← props માં syncData ઉમ�
 
   const handleAddExpense = (expenseData) => {
     if (editingExpense) {
-      // Update Expense
       updateExpense(editingExpense.id, expenseData);
       setEditingExpense(null);
     } else {
-      // Add Expense
       const newExpense = {
         id: Date.now().toString(),
         date: expenseData.date || new Date().toISOString().split('T')[0],
@@ -48,17 +46,12 @@ function DailyExpenses({ syncData }) {  // ← props માં syncData ઉમ�
         createdAt: new Date().toISOString()
       };
       
-      // 🔥 Firebase માં સેવ કરો
-      addExpenseToFirebase(newExpense);
-      
-      // Local Storage માં સેવ કરો
       addExpense(newExpense);
     }
     
     loadData();
     setShowModal(false);
     
-    // ✅ Firebase Sync કરો
     if (syncData) {
       syncData();
     }
@@ -67,9 +60,9 @@ function DailyExpenses({ syncData }) {  // ← props માં syncData ઉમ�
   const handleDelete = (id) => {
     if (window.confirm('શું તમે ખરેખર આ ખર્ચને ડિલીટ કરવા માંગો છો?')) {
       deleteExpense(id);
+      deleteExpenseFromFirebase(id);
       loadData();
       
-      // ✅ Firebase Sync કરો
       if (syncData) {
         syncData();
       }
@@ -98,7 +91,6 @@ function DailyExpenses({ syncData }) {  // ← props માં syncData ઉમ�
         </button>
       </div>
 
-      {/* Stats Cards */}
       <div className="row g-2 mb-3">
         <div className="col-6">
           <div className="card shadow-sm p-2 text-center">
@@ -133,4 +125,4 @@ function DailyExpenses({ syncData }) {  // ← props માં syncData ઉમ�
   );
 }
 
-export default DailyExpenses;  // ← default export છે તેની ખાતરી કરો
+export default DailyExpenses;

@@ -11,6 +11,12 @@ import {
 } from "firebase/database";
 
 // ===== 🔥 તમારો Firebase Config =====
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyATkGW2da0VyRwKP2LuskJR194XqtzVGcc",
   authDomain: "madhav-construction-8bd91.firebaseapp.com",
@@ -21,17 +27,16 @@ const firebaseConfig = {
   appId: "1:1081216319569:web:a869be2446cd81f2997870"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
 
-// ✅ અહીં db ને ઇનિશિયલાઇઝ કરવાનું ચૂકી ગયા હતા, તે ઉમેર્યું
+// ✅ Firebase Initialize - ફક્ત એક વાર
+const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 // =============================================
 // 📌 DATABASE FUNCTIONS
 // =============================================
 
-// 1️⃣ બધો ડેટા સેવ કરો (Sync)
+// 1️⃣ બધો ડેટા સેવ કરો (Sync) - આખો ડેટા એક સાથે
 export const syncAllData = (labours, expenses, personalExpenses) => {
   set(ref(db, 'madhavData'), {
     labours: labours || [],
@@ -56,17 +61,7 @@ export const listenAllData = (callback) => {
   });
 };
 
-// 3️⃣ લેબર ઉમેરો
-export const addLabourToFirebase = (labour) => {
-  const laboursRef = ref(db, 'madhavData/labours');
-  onValue(laboursRef, (snapshot) => {
-    const labours = snapshot.val() || [];
-    labours.push(labour);
-    set(laboursRef, labours);
-  }, { onlyOnce: true });
-};
-
-// 4️⃣ લેબર ડિલીટ કરો (ID વડે)
+// 3️⃣ લેબર ડિલીટ કરો (ID વડે)
 export const deleteLabourFromFirebase = (id) => {
   const laboursRef = ref(db, 'madhavData/labours');
   onValue(laboursRef, (snapshot) => {
@@ -76,17 +71,7 @@ export const deleteLabourFromFirebase = (id) => {
   }, { onlyOnce: true });
 };
 
-// 5️⃣ ખર્ચ ઉમેરો (Site Expense)
-export const addExpenseToFirebase = (expense) => {
-  const expensesRef = ref(db, 'madhavData/expenses');
-  onValue(expensesRef, (snapshot) => {
-    const expenses = snapshot.val() || [];
-    expenses.push(expense);
-    set(expensesRef, expenses);
-  }, { onlyOnce: true });
-};
-
-// 6️⃣ ખર્ચ ડિલીટ કરો (ID વડે)
+// 4️⃣ ખર્ચ ડિલીટ કરો (ID વડે)
 export const deleteExpenseFromFirebase = (id) => {
   const expensesRef = ref(db, 'madhavData/expenses');
   onValue(expensesRef, (snapshot) => {
@@ -96,17 +81,7 @@ export const deleteExpenseFromFirebase = (id) => {
   }, { onlyOnce: true });
 };
 
-// 7️⃣ Personal ખર્ચ ઉમેરો
-export const addPersonalExpenseToFirebase = (expense) => {
-  const personalRef = ref(db, 'madhavData/personalExpenses');
-  onValue(personalRef, (snapshot) => {
-    const expenses = snapshot.val() || [];
-    expenses.push(expense);
-    set(personalRef, expenses);
-  }, { onlyOnce: true });
-};
-
-// 8️⃣ Personal ખર્ચ ડિલીટ કરો (ID વડે)
+// 5️⃣ Personal ખર્ચ ડિલીટ કરો (ID વડે)
 export const deletePersonalExpenseFromFirebase = (id) => {
   const personalRef = ref(db, 'madhavData/personalExpenses');
   onValue(personalRef, (snapshot) => {
@@ -116,7 +91,7 @@ export const deletePersonalExpenseFromFirebase = (id) => {
   }, { onlyOnce: true });
 };
 
-// 9️⃣ Database Check - ડેટા છે કે નહીં
+// 6️⃣ Database Check - ડેટા છે કે નહીં
 export const checkDatabase = () => {
   const dataRef = ref(db, 'madhavData');
   onValue(dataRef, (snapshot) => {
