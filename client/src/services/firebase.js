@@ -4,19 +4,10 @@ import {
   ref, 
   set, 
   onValue, 
-  remove, 
-  update,
-  push,
-  child
+  remove 
 } from "firebase/database";
 
-// ===== 🔥 તમારો Firebase Config =====
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
+// ===== 🔥 Firebase Config =====
 const firebaseConfig = {
   apiKey: "AIzaSyATkGW2da0VyRwKP2LuskJR194XqtzVGcc",
   authDomain: "madhav-construction-8bd91.firebaseapp.com",
@@ -27,7 +18,6 @@ const firebaseConfig = {
   appId: "1:1081216319569:web:a869be2446cd81f2997870"
 };
 
-
 // ✅ Firebase Initialize - ફક્ત એક વાર
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -36,7 +26,7 @@ const db = getDatabase(app);
 // 📌 DATABASE FUNCTIONS
 // =============================================
 
-// 1️⃣ બધો ડેટા સેવ કરો (Sync) - આખો ડેટા એક સાથે
+// 1️⃣ બધો ડેટા સેવ કરો (Sync)
 export const syncAllData = (labours, expenses, personalExpenses) => {
   set(ref(db, 'madhavData'), {
     labours: labours || [],
